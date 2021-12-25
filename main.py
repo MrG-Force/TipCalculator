@@ -9,13 +9,26 @@ def calculate_tip(total, tip, people):
 
 def main():
     def display_result():
-        person_share.insert(0, f"${calculate_tip(total.get(), tip.get(), people.get())}")
+        person_share.delete(0, 'end')
+        if tip.get() == -1:
+            person_share.insert(0, f"${calculate_tip(total.get(), custom_tip.get(), people.get())}")
+        else:
+            person_share.insert(0, f"${calculate_tip(total.get(), tip.get(), people.get())}")
 
     def reset_form():
-        person_share.delete(0, 'end')
         total.set(0)
         tip.set(0)
+        custom_tip.set(1)
         people.set(1)
+        person_share.delete(0, 'end')
+        tip_custom_entry.config(state=DISABLED)
+
+    def toggle_custom_tip():
+        print(f"tip = {tip.get()}")
+        if tip.get() == -1:
+            tip_custom_entry.config(state=NORMAL)
+        else:
+            tip_custom_entry.config(state=DISABLED)
 
     root = Tk()
     root.minsize(500, 230)
@@ -51,12 +64,15 @@ def main():
 
     # Tip row
     tip = IntVar()
+    custom_tip = IntVar()
     tip_label = ttk.Label(body, text="How much tip would you like to give?")
-    tip_none_radio_btn = ttk.Radiobutton(body, text="No tip", variable=tip, value=0, width=8)
-    tip_10_radio_btn = ttk.Radiobutton(body, text="10%", variable=tip, value=10, width=10)
-    tip_12_radio_btn = ttk.Radiobutton(body, text="12%", variable=tip, value=12, width=10)
-    tip_15_radio_btn = ttk.Radiobutton(body, text="15%", variable=tip, value=15, width=10)
-    tip_custom_radio_btn = ttk.Radiobutton(body, text="Custom", variable=tip, value=-1, width=10)
+    tip_none_radio_btn = ttk.Radiobutton(body, text="No tip", variable=tip, value=0, width=8, command=toggle_custom_tip)
+    tip_10_radio_btn = ttk.Radiobutton(body, text="10%", variable=tip, value=10, width=10, command=toggle_custom_tip)
+    tip_12_radio_btn = ttk.Radiobutton(body, text="12%", variable=tip, value=12, width=10, command=toggle_custom_tip)
+    tip_15_radio_btn = ttk.Radiobutton(body, text="15%", variable=tip, value=15, width=10, command=toggle_custom_tip)
+    tip_custom_radio_btn = ttk.Radiobutton(body, text="Custom",
+                                           variable=tip, value=-1, width=10, command=toggle_custom_tip)
+    tip_custom_entry = Spinbox(body, from_=1, to=100, textvariable=custom_tip, width=5, state=DISABLED)
     # ---- layout ----
     tip_label.grid(row=1, column=0, columnspan=5, sticky="w")
     tip_none_radio_btn.grid(row=2, column=0)
@@ -64,10 +80,11 @@ def main():
     tip_12_radio_btn.grid(row=2, column=2)
     tip_15_radio_btn.grid(row=2, column=3)
     tip_custom_radio_btn.grid(row=2, column=4)
+    tip_custom_entry.grid(row=2, column=5)
 
     # How many people row
     people = IntVar()
-    people_input = Spinbox(body, from_=1, to=10000, textvariable=people, width=15)
+    people_input = Spinbox(body, from_=1, to=10000, textvariable=people, width=10)
     people_label = ttk.Label(body, text="How many people to split the bill?")
     # ---- layout ----
     people_label.grid(row=4, column=0, columnspan=2, sticky="w")
@@ -77,7 +94,7 @@ def main():
     calculate_btn = Button(body, text="Calculate", command=display_result)
     clear_btn = Button(body, text="Clear", command=reset_form, width=8)
     # ---- layout ----
-    calculate_btn.grid(row=5, column=0, columnspan=2)
+    calculate_btn.grid(row=5, column=1, columnspan=2)
     clear_btn.grid(row=5, column=2, columnspan=2)
 
     # Person share row
@@ -94,4 +111,4 @@ def main():
 if __name__ == '__main__':
     main()
 
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+
